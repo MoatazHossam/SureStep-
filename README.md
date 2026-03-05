@@ -352,3 +352,26 @@ Codex: implement the following PRs in order. Each PR must include tests and docs
 - Ensure robust JSON validation + retry
 
 Done.
+
+## PR automation troubleshooting (`Failed to create PR`)
+If Codex shows **"Failed to create PR"**, use this preflight checklist before calling `make_pr`:
+
+1. Confirm branch context
+   - `git branch --show-current` is not detached
+   - you are on the working branch intended for the PR
+2. Confirm repository state
+   - `git status --short` is clean **after** staging/commit
+   - `git log --oneline -1` shows the new commit you expect
+3. Confirm command order
+   - Required sequence: **edit -> test/check -> git commit -> make_pr**
+   - Do **not** call `make_pr` before commit
+   - Do **not** finish with committed changes without calling `make_pr`
+
+Common invalid states that cause PR automation failure:
+- State A: `make_pr` called with no new committed changes
+- State B: changes committed, but `make_pr` never called
+
+Minimal recovery steps:
+1. `git status --short && git branch --show-current`
+2. If needed: `git add -A && git commit -m "<message>"`
+3. Call `make_pr` once with a clear title/body that summarizes the committed diff
